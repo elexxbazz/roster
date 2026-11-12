@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101713">
+  <title>Roster · Player Database</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg:#0c120f; --panel:#121b16; --panel-2:#17221b; --line:#26352b;
+      --text:#edf4ee; --muted:#91a196; --green:#9be36b; --green-2:#6fb84b;
+      --red:#ff7777; --shadow:0 18px 55px rgba(0,0,0,.28);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(ellipse at 85% -15%,rgba(116,180,79,.12),transparent 38%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .shell{max-width:1440px;margin:auto;padding:32px clamp(16px,3vw,42px) 54px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:34px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand-mark{width:42px;height:42px;border-radius:13px;background:var(--green);display:grid;place-items:center;color:#142012;font-size:21px;font-weight:900;box-shadow:0 8px 28px #9be36b22}
+    .brand-name{font-size:16px;font-weight:800;letter-spacing:.04em}
+    .brand-sub{font-size:11px;color:var(--muted);letter-spacing:.13em;text-transform:uppercase}
+    .top-actions{display:flex;gap:9px;flex-wrap:wrap}
+    .btn{border:1px solid var(--line);background:var(--panel-2);color:var(--text);padding:10px 14px;border-radius:11px;font-weight:650;transition:.18s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+    .btn:hover{border-color:#54704e;transform:translateY(-1px)}
+    .btn.primary{background:var(--green);border-color:var(--green);color:#152111}
+    .btn.primary:hover{background:#b0f187}
+    .btn.subtle{background:transparent}
+    .btn.danger{color:var(--red)}
+    .hero{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:25px}
+    .eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px}
+    h1{font-size:clamp(28px,4vw,42px);line-height:1.08;letter-spacing:-.045em;margin:0 0 8px}
+    .hero p{color:var(--muted);margin:0}
+    .hero-stat{border:1px solid var(--line);background:#121b16b8;border-radius:15px;padding:13px 18px;min-width:135px}
+    .hero-stat strong{display:block;font-size:24px;line-height:1.2}
+    .hero-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+    .stat{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:15px 17px}
+    .stat-label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+    .stat-value{font-size:21px;font-weight:800;margin-top:3px}
+    .toolbar{display:grid;grid-template-columns:minmax(220px,1.6fr) repeat(3,minmax(135px,.8fr)) auto;gap:10px;padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:15px}
+    .field{display:flex;flex-direction:column;gap:6px;min-width:0}
+    .field label{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    input,select{width:100%;min-width:0;background:#0d1510;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:11px 12px;outline:none}
+    input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px #9be36b18}
+    input::placeholder{color:#66756b}
+    .search-wrap{position:relative}
+    .search-wrap input{padding-left:37px}
+    .search-icon{position:absolute;left:13px;top:11px;color:var(--muted);font-size:16px}
+    .toolbar-end{display:flex;align-items:end}
+    .toolbar-end .btn{height:42px;white-space:nowrap}
+    .list-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 2px 10px}
+    .list-head strong{font-size:14px}
+    .list-head span{color:var(--muted);font-size:12px}
+    .table-wrap{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--panel)}
+    table{width:100%;border-collapse:collapse;text-align:left}
+    th{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:800;background:#17211a;padding:14px 16px;white-space:nowrap}
+    th button{background:none;border:0;color:inherit;padding:0;font:inherit;letter-spacing:inherit;text-transform:inherit}
+    th button:hover{color:var(--green)}
+    td{padding:13px 16px;border-top:1px solid var(--line);vertical-align:middle}
+    tbody tr{transition:background .15s}
+    tbody tr:hover{background:#ffffff05}
+    .player{display:flex;align-items:center;gap:11px;min-width:180px}
+    .avatar{width:39px;height:39px;border-radius:12px;object-fit:cover;background:#26362b;display:grid;place-items:center;color:#b5c8b9;font-weight:800;flex:none}
+    .player-name{font-weight:750}
+    .player-team{font-size:11px;color:var(--muted);margin-top:2px}
+    .role{display:inline-flex;align-items:center;justify-content:center;min-width:34px;padding:5px 8px;border-radius:8px;background:#243529;color:#c7f5ae;font-size:11px;font-weight:850}
+    .number{font-variant-numeric:tabular-nums;font-weight:700}
+    .value{color:var(--green);font-weight:800}
+    .row-actions{display:flex;gap:6px;justify-content:flex-end}
+    .icon-btn{width:32px;height:32px;border:1px solid var(--line);border-radius:9px;background:#101812;color:#aebdb1}
+    .icon-btn:hover{color:var(--green);border-color:#648353}
+    .icon-btn.delete:hover{color:var(--red);border-color:#854747}
+    .mobile-list{display:none;gap:9px}
+    .mobile-card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:13px;display:grid;grid-template-columns:42px 1fr auto;gap:11px;align-items:center}
+    .mobile-card .avatar{width:42px;height:42px}
+    .mobile-meta{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin-top:5px}
+    .mobile-value{text-align:right;color:var(--green);font-weight:800}
+    .mobile-actions{grid-column:2/4;display:flex;justify-content:flex-end;gap:7px}
+    .empty{padding:58px 20px;text-align:center;color:var(--muted)}
+    .empty-icon{font-size:28px;margin-bottom:8px}
+    .empty strong{display:block;color:var(--text);font-size:15px;margin-bottom:4px}
+    .footer{display:flex;justify-content:space-between;gap:14px;color:#718176;font-size:11px;margin-top:16px}
+    .modal-backdrop{position:fixed;inset:0;background:#000a;backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+    .modal-backdrop.open{display:flex}
+    .modal{width:min(540px,100%);max-height:92vh;overflow:auto;background:#121b16;border:1px solid #344638;border-radius:20px;box-shadow:var(--shadow);padding:22px;animation:rise .2s ease}
+    @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:19px}
+    .modal-head h2{font-size:20px;margin:0;letter-spacing:-.03em}
+    .close{border:0;background:transparent;color:var(--muted);font-size:23px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .form-grid .wide{grid-column:1/-1}
+    .photo-box{display:flex;align-items:center;gap:13px}
+    .photo-preview{width:66px;height:66px;border-radius:15px;object-fit:cover;background:#26362b;display:grid;place-items:center;font-size:21px;color:#b5c8b9}
+    .photo-controls{display:flex;gap:8px;flex-wrap:wrap}
+    .photo-controls .btn{padding:8px 10px;font-size:12px}
+    .hint{font-size:11px;color:var(--muted);margin-top:5px}
+    .modal-actions{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+    .modal-actions-right{display:flex;gap:8px}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,15px);background:#dff8d0;color:#172512;padding:11px 16px;border-radius:11px;font-weight:750;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.2s;z-index:20}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .file-input{display:none}
+    @media(max-width:900px){.toolbar{grid-template-columns:1fr 1fr}.toolbar .search-field{grid-column:1/-1}.toolbar-end{align-items:stretch}.toolbar-end .btn{width:100%}.table-wrap{overflow-x:auto}table{min-width:760px}}
+    @media(max-width:620px){
+      .shell{padding:20px 14px 34px}.topbar{align-items:flex-start;margin-bottom:26px}.top-actions{gap:6px}.top-actions .btn{padding:9px 10px;font-size:12px}
+      .brand-mark{width:38px;height:38px}.brand-name{font-size:14px}.brand-sub{font-size:9px}
+      .hero{align-items:flex-start}.hero-stat{min-width:90px;padding:10px 12px}.hero-stat strong{font-size:20px}.hero-stat span{font-size:9px}
+      .stats{gap:7px}.stat{padding:11px}.stat-label{font-size:9px}.stat-value{font-size:17px}
+      .toolbar{padding:10px;gap:8px}.toolbar .field label{font-size:9px}.toolbar input,.toolbar select{padding:10px;font-size:13px}
+      .table-wrap{display:none}.mobile-list{display:grid}.list-head{margin-top:15px}.footer{flex-direction:column}
+      .form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.modal{padding:18px}
+    }
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">R</div>
+        <div><div class="brand-name">ROSTER</div><div class="brand-sub">Player database</div></div>
+      </div>
+      <div class="top-actions">
+        <button class="btn subtle" id="importBtn" type="button">↥ <span>Importa</span></button>
+        <button class="btn subtle" id="exportBtn" type="button">↧ <span>Esporta JSON</span></button>
+        <input class="file-input" id="importFile" type="file" accept=".json,application/json">
+        <button class="btn primary" id="addBtn" type="button">＋ Nuovo giocatore</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div><div class="eyebrow">La tua rosa, sotto controllo</div><h1>Player database<span style="color:var(--green)">.</span></h1><p>Un archivio personale, ordinato fino all'ultimo fantamilione.</p></div>
+      <div class="hero-stat"><strong id="totalPlayers">0</strong><span>Giocatori totali</span></div>
+    </section>
+
+    <section class="stats" aria-label="Statistiche database">
+      <div class="stat"><div class="stat-label">Valore complessivo</div><div class="stat-value" id="totalValue">0</div></div>
+      <div class="stat"><div class="stat-label">Media voti</div><div class="stat-value" id="averageRating">—</div></div>
+      <div class="stat"><div class="stat-label">Squadre presenti</div><div class="stat-value" id="teamCount">0</div></div>
+    </section>
+
+    <section class="toolbar" aria-label="Ricerca e filtri">
+      <div class="field search-field"><label for="search">Cerca giocatore</label><div class="search-wrap"><span class="search-icon">⌕</span><input id="search" type="search" placeholder="Nome, cognome o squadra…" autocomplete="off"></div></div>
+      <div class="field"><label for="roleFilter">Ruolo</label><select id="roleFilter"><option value="">Tutti i ruoli</option><option>P</option><option>D</option><option>C</option><option>A</option></select></div>
+      <div class="field"><label for="teamFilter">Squadra</label><select id="teamFilter"><option value="">Tutte le squadre</option></select></div>
+      <div class="field"><label for="valueFilter">Valore</label><select id="valueFilter"><option value="">Qualsiasi valore</option><option value="0-5">0–5</option><option value="5-10">5–10</option><option value="10-20">10–20</option><option value="20-50">20–50</option><option value="50+">50+</option></select></div>
+      <div class="toolbar-end"><button class="btn subtle" id="resetBtn" type="button">↺ Azzera</button></div>
+    </section>
+
+    <div class="list-head"><strong>Archivio giocatori</strong><span id="resultCount">0 risultati</span></div>
+    <section class="table-wrap" aria-label="Tabella giocatori">
+      <table>
+        <thead><tr>
+          <th><button data-sort="name">Giocatore ↕</button></th>
+          <th><button data-sort="team">Squadra ↕</button></th>
+          <th><button data-sort="role">Ruolo ↕</button></th>
+          <th><button data-sort="rating">Media voti ↕</button></th>
+          <th><button data-sort="value">Valore ↕</button></th>
+          <th style="text-align:right">Azioni</th>
+        </tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="empty" id="emptyDesktop"><div class="empty-icon">◎</div><strong>Nessun giocatore trovato</strong>Prova a modificare i filtri o aggiungi il primo giocatore.</div>
+    </section>
+    <section class="mobile-list" id="mobileList" aria-label="Schede giocatori"></section>
+    <div class="footer"><span>● Salvataggio automatico attivo · dati conservati su questo dispositivo</span><span>Backup consigliato prima di cambiare browser o dispositivo</span></div>
+  </main>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <form class="modal" id="playerForm">
+      <div class="modal-head"><h2 id="modalTitle">Nuovo giocatore</h2><button class="close" type="button" id="closeModal" aria-label="Chiudi">×</button></div>
+      <div class="form-grid">
+        <div class="field wide"><label>Foto giocatore</label><div class="photo-box"><img id="photoPreview" class="photo-preview" alt="Anteprima foto" src=""><div class="photo-controls"><label class="btn" for="photoInput">＋ Carica foto</label><button class="btn subtle" type="button" id="removePhoto">Rimuovi foto</button><input class="file-input" id="photoInput" type="file" accept="image/*"></div></div><div class="hint">Immagini ridimensionate automaticamente per contenere lo spazio occupato.</div></div>
+        <div class="field"><label for="firstName">Nome *</label><input id="firstName" required maxlength="50" placeholder="Es. Lautaro"></div>
+        <div class="field"><label for="lastName">Cognome *</label><input id="lastName" required maxlength="50" placeholder="Es. Martínez"></div>
+        <div class="field"><label for="team">Squadra *</label><input id="team" required maxlength="50" placeholder="Es. Inter"></div>
+        <div class="field"><label for="role">Ruolo *</label><select id="role" required><option value="">Seleziona ruolo</option><option value="P">Portiere · P</option><option value="D">Difensore · D</option><option value="C">Centrocampista · C</option><option value="A">Attaccante · A</option></select></div>
+        <div class="field"><label for="rating">Media voti</label><input id="rating" type="number" min="0" max="10" step="0.01" placeholder="Es. 6.45"></div>
+        <div class="field"><label for="marketValue">Valore di mercato</label><input id="marketValue" type="number" min="0" step="1" placeholder="Es. 35"></div>
+      </div>
+      <div class="modal-actions"><button class="btn danger" type="button" id="deleteFromModal" style="visibility:hidden">Elimina</button><div class="modal-actions-right"><button class="btn" type="button" id="cancelModal">Annulla</button><button class="btn primary" type="submit">Salva giocatore</button></div></div>
+    </form>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = 'roster-player-database-v1';
+      const $ = id => document.getElementById(id);
+      let players = loadPlayers();
+      let editingId = null;
+      let photoData = '';
+      let sortKey = 'name';
+      let sortDirection = 1;
+      let toastTimer;
+
+      function loadPlayers() {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+          return Array.isArray(parsed) ? parsed.filter(p => p && p.id) : [];
+        } catch { return []; }
+      }
+      function savePlayers() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
+          return true;
+        } catch (err) {
+          notify('Spazio di archiviazione esaurito. Rimuovi alcune foto o esporta un backup.');
+          return false;
+        }
+      }
+      function escapeHtml(value='') {
+        return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      }
+      function initials(p) {
+        return `${(p.firstName||'')[0]||''}${(p.lastName||'')[0]||''}`.toUpperCase() || '•';
+      }
+      function photoMarkup(p, cls='avatar') {
+        return p.photo
+          ? `<img class="${cls}" src="${p.photo}" alt="Foto di ${escapeHtml(p.firstName)} ${escapeHtml(p.lastName)}">`
+          : `<div class="${cls}" aria-label="Nessuna foto">${escapeHtml(initials(p))}</div>`;
+      }
+      function money(v) { return `${Number(v || 0).toLocaleString('it-IT')} crediti`; }
+      function notify(message) {
+        const el = $('toast'); el.textContent = message; el.classList.add('show');
+        clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+      }
+      function filteredPlayers() {
+        const query = $('search').value.trim().toLocaleLowerCase('it');
+        const role = $('roleFilter').value, team = $('teamFilter').value, band = $('valueFilter').value;
+        return players.filter(p => {
+          const haystack = `${p.firstName} ${p.lastName} ${p.team}`.toLocaleLowerCase('it');
+          if (query && !haystack.includes(query)) return false;
+          if (role && p.role !== role) return false;
+          if (team && p.team !== team) return false;
+          const v = Number(p.value || 0);
+          if (band === '0-5' && !(v >= 0 && v < 5)) return false;
+          if (band === '5-10' && !(v >= 5 && v < 10)) return false;
+          if (band === '10-20' && !(v >= 10 && v < 20)) return false;
+          if (band === '20-50' && !(v >= 20 && v < 50)) return false;
+          if (band === '50+' && v < 50) return false;
+          return true;
+        }).sort((a,b) => {
+          let av = sortKey === 'name' ? `${a.firstName} ${a.lastName}` : a[sortKey];
+          let bv = sortKey === 'name' ? `${b.firstName} ${b.lastName}` : b[sortKey];
+          if (['rating','value'].includes(sortKey)) return (Number(av||0)-Number(bv||0))*sortDirection;
+          return String(av||'').localeCompare(String(bv||''),'it',{sensitivity:'base'})*sortDirection;
+        });
+      }
+      function render() {
+        const shown = filteredPlayers();
+        $('totalPlayers').textContent = players.length;
+        $('totalValue').textContent = `${players.reduce((s,p)=>s+Number(p.value||0),0).toLocaleString('it-IT')} cr`;
+        const rated = players.filter(p => p.rating !== '' && p.rating != null);
+        $('averageRating').textContent = rated.length ? (rated.reduce((s,p)=>s+Number(p.rating),0)/rated.length).toFixed(2) : '—';
+        $('teamCount').textContent = new Set(players.map(p=>p.team.trim().toLocaleLowerCase('it')).filter(Boolean)).size;
+        $('resultCount').textContent = `${shown.length} ${shown.length === 1 ? 'risultato' : 'risultati'}`;
+        const teams = [...new Set(players.map(p=>p.team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'));
+        const selected = $('teamFilter').value;
+        $('teamFilter').innerHTML = '<option value="">Tutte le squadre</option>' + teams.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+        $('teamFilter').value = teams.includes(selected) ? selected : '';
+        $('tableBody').innerHTML = shown.map(p => `<tr>
+          <td><div class="player">${photoMarkup(p)}<div><div class="player-name">${escapeHtml(p.firstName)} ${escapeHtml(p.lastName)}</div><div class="player-team">${escapeHtml(p.team)}</div></div></div></td>
+          <td>${escapeHtml(p.team)}</td><td><span class="role">${escapeHtml(p.role)}</span></td>
+          <td class="number">${p.rating === '' || p.rating == null ? '—' : Number(p.rating).toFixed(2)}</td>
+          <td class="value">${money(p.value)}</td>
+          <td><div class="row-actions"><button class="icon-btn" data-edit="${p.id}" title="Modifica" aria-label="Modifica ${escapeHtml(p.firstName)}">✎</button><button class="icon-btn delete" data-delete="${p.id}" title="Elimina" aria-label="Elimina ${escapeHtml(p.firstName)}">×</button></div></td>
+        </tr>`).join('');
+        $('emptyDesktop').style.display = shown.length ? 'none' : 'block';
+        $('mobileList').innerHTML = shown.map(p => `<article class="mobile-card">
+          ${photoMarkup(p)}<div><div class="player-name">${escapeHtml(p.firstName)} ${escapeHtml(p.lastName)}</div><div class="mobile-meta"><span>${escapeHtml(p.team)}</span><span class="role">${escapeHtml(p.role)}</span><span>MV ${p.rating === '' || p.rating == null ? '—' : Number(p.rating).toFixed(2)}</span></div></div>
+          <div class="mobile-value">${Number(p.value||0).toLocaleString('it-IT')}<small style="display:block;color:var(--muted);font-size:10px;font-weight:500">crediti</small></div>
+          <div class="mobile-actions"><button class="btn" data-edit="${p.id}">✎ Modifica</button><button class="btn danger" data-delete="${p.id}">Elimina</button></div>
+        </article>`).join('') || `<div class="empty"><div class="empty-icon">◎</div><strong>Nessun giocatore trovato</strong>Prova a modificare i filtri o aggiungi il primo giocatore.</div>`;
+      }
+      function openModal(player=null) {
+        editingId = player ? player.id : null; photoData = player?.photo || '';
+        $('modalTitle').textContent = player ? 'Modifica giocatore' : 'Nuovo giocatore';
+        $('firstName').value = player?.firstName || ''; $('lastName').value = player?.lastName || '';
+        $('team').value = player?.team || ''; $('role').value = player?.role || '';
+        $('rating').value = player?.rating ?? ''; $('marketValue').value = player?.value ?? '';
+        updatePreview();
+        $('deleteFromModal').style.visibility = player ? 'visible' : 'hidden';
+        $('modalBackdrop').classList.add('open'); document.body.style.overflow='hidden';
+        setTimeout(()=>$('firstName').focus(),50);
+      }
+      function closeModal() { $('modalBackdrop').classList.remove('open'); document.body.style.overflow=''; $('playerForm').reset(); photoData=''; editingId=null; }
+      function updatePreview() {
+        const img = $('photoPreview');
+        if (photoData) {
+          img.src = photoData;
+          img.alt = 'Anteprima foto giocatore';
+        } else {
+          const letters = (($('firstName').value[0] || '') + ($('lastName').value[0] || '')).toUpperCase() || '•';
+          const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="132" height="132"><rect width="100%" height="100%" rx="24" fill="#26362b"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="42" font-weight="700" fill="#b5c8b9">${letters}</text></svg>`;
+          img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+          img.alt = 'Anteprima senza foto';
+        }
+      }
+      function deletePlayer(id) {
+        const p=players.find(x=>x.id===id); if(!p) return;
+        if(!confirm(`Eliminare ${p.firstName} ${p.lastName} dal database?`)) return;
+        players=players.filter(x=>x.id!==id); savePlayers(); render(); closeModal(); notify('Giocatore eliminato');
+      }
+      $('addBtn').addEventListener('click',()=>openModal());
+      $('closeModal').addEventListener('click',closeModal); $('cancelModal').addEventListener('click',closeModal);
+      $('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal()});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape' && $('modalBackdrop').classList.contains('open'))closeModal()});
+      $('playerForm').addEventListener('submit',e=>{
+        e.preventDefault();
+        const data={firstName:$('firstName').value.trim(),lastName:$('lastName').value.trim(),team:$('team').value.trim(),role:$('role').value,rating:$('rating').value===''?'':Number($('rating').value),value:$('marketValue').value===''?0:Number($('marketValue').value),photo:photoData};
+        if(!data.firstName||!data.lastName||!data.team||!data.role){notify('Completa tutti i campi obbligatori');return}
+        if(data.rating!=='' && (data.rating<0||data.rating>10)){notify('La media voti deve essere tra 0 e 10');return}
+        if(data.value<0){notify('Il valore non può essere negativo');return}
+        if(editingId){players=players.map(p=>p.id===editingId?{...p,...data}:p);notify('Modifiche salvate')}
+        else {players.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),...data,createdAt:new Date().toISOString()});notify('Giocatore aggiunto alla rosa')}
+        savePlayers(); render(); closeModal();
+      });
+      $('photoInput').addEventListener('change',e=>{
+        const file=e.target.files?.[0]; if(!file)return;
+        if(!file.type.startsWith('image/')){notify('Seleziona un file immagine');return}
+        const reader=new FileReader();
+        reader.onload=()=>{
+          const img=new Image(); img.onload=()=>{
+            const max=480,scale=Math.min(1,max/Math.max(img.width,img.height));
+            const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
+            canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+            photoData=canvas.toDataURL('image/jpeg',.82);updatePreview();e.target.value='';
+          };img.src=reader.result;
+        };reader.readAsDataURL(file);
+      });
+      $('removePhoto').addEventListener('click',()=>{photoData='';updatePreview();$('photoInput').value='';});
+      $('deleteFromModal').addEventListener('click',()=>{if(editingId)deletePlayer(editingId)});
+      ['search','roleFilter','teamFilter','valueFilter'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
+      $('resetBtn').addEventListener('click',()=>{$('search').value='';$('roleFilter').value='';$('teamFilter').value='';$('valueFilter').value='';render()});
+      document.querySelectorAll('[data-sort]').forEach(btn=>btn.addEventListener('click',()=>{
+        const key=btn.dataset.sort;if(sortKey===key)sortDirection*=-1;else{sortKey=key;sortDirection=1}render();
+      }));
+      document.addEventListener('click',e=>{
+        const edit=e.target.closest('[data-edit]'), del=e.target.closest('[data-delete]');
+        if(edit){const p=players.find(x=>x.id===edit.dataset.edit);if(p)openModal(p)}
+        if(del)deletePlayer(del.dataset.delete);
+      });
+      $('exportBtn').addEventListener('click',()=>{
+        const payload={app:'Roster Player Database',version:1,exportedAt:new Date().toISOString(),players};
+        const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+        const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`roster-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url);notify('Backup JSON esportato');
+      });
+      $('importBtn').addEventListener('click',()=>$('importFile').click());
+      $('importFile').addEventListener('change',e=>{
+        const file=e.target.files?.[0];if(!file)return;
+        const reader=new FileReader();reader.onload=()=>{
+          try{
+            const parsed=JSON.parse(reader.result),incoming=Array.isArray(parsed)?parsed:parsed.players;
+            if(!Array.isArray(incoming))throw new Error('Formato non valido');
+            const clean=incoming.map((p,i)=>{
+              if(!p||typeof p!=='object'||!String(p.firstName||'').trim()||!String(p.lastName||'').trim()||!String(p.team||'').trim()||!['P','D','C','A'].includes(p.role))throw new Error(`Dati non validi nel giocatore ${i+1}`);
+              return {id:String(p.id||`${Date.now()}-${i}`),firstName:String(p.firstName).trim(),lastName:String(p.lastName).trim(),team:String(p.team).trim(),role:p.role,rating:p.rating===''||p.rating==null?'':Number(p.rating),value:Math.max(0,Number(p.value||0)),photo:typeof p.photo==='string'&&p.photo.startsWith('data:image/')?p.photo:''};
+            });
+            if(!confirm(`Importare ${clean.length} giocatori? Il database attuale verrà sostituito.`))return;
+            players=clean;savePlayers();render();notify(`Importati ${clean.length} giocatori`);
+          }catch(err){alert(`Impossibile importare il file: ${err.message}`)}
+          finally{e.target.value=''}
+        };reader.readAsText(file);
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>
